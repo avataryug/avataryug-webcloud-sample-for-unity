@@ -8,9 +8,35 @@ namespace com.Avataryug.WebView
         public RectTransform webPanel;
         public RectTransform topOffset;
 
+        const string pluginName = "com.avataryug.unitywebview.AvataryugWeb";
+
+        class NetworkMessageReceiveCallback : AndroidJavaProxy
+        {
+            System.Action<string> OnReceiveNetworkMessage;
+            public NetworkMessageReceiveCallback(System.Action<string> netwrtorkmsg) : base(pluginName + "$NetworkMessageReceiveCallback")
+            {
+                OnReceiveNetworkMessage = netwrtorkmsg;
+            }
+            public void onReceiveMessage(string message)
+            {
+                if (OnReceiveNetworkMessage != null)
+                    OnReceiveNetworkMessage(message);
+            }
+        }
+
+        System.Action<string> OnReceiveNetworkMessage;
         private void OnEnable()
         {
             OpenWebViewTapped();
+            OnReceiveNetworkMessage += OnReceive;
+#if UNITY_ANDROID
+            AndoridWebView.PluginInstance.Call("SubscribeCallback", new object[] { new NetworkMessageReceiveCallback(OnReceiveNetworkMessage) });
+#endif
+        }
+
+        void OnReceive(string message)
+        {
+            Debug.Log("=============>>>" + message);
         }
 
         public void OpenWebViewTapped()
@@ -21,6 +47,7 @@ namespace com.Avataryug.WebView
 
             OpenWebView("https://" + ProjectID + ".avataredge.net", stripHeight);
         }
+
         public void OpenWebView(string url, int pixelShift)
         {
 
@@ -29,7 +56,8 @@ namespace com.Avataryug.WebView
 #endif
 
 #if UNITY_IOS
-        IOSWebView.IOSshowWebView(url, pixelShift);
+            IOSWebView.IOSClearCache();
+            IOSWebView.IOSshowWebView(url, pixelShift);
 #endif
         }
 
@@ -40,7 +68,7 @@ namespace com.Avataryug.WebView
 #endif
 
 #if UNITY_IOS
-        IOSWebView.IOShideWebView();
+            IOSWebView.IOShideWebView();
 #endif
             closeComplete();
         }

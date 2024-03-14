@@ -2,7 +2,7 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
-@interface MyPlugin: NSObject <WKNavigationDelegate>
+@interface MyPlugin: NSObject <WKNavigationDelegate, WKScriptMessageHandler>
 {
     NSDate *creationDate;
     UIPopoverController *popover;
@@ -50,12 +50,18 @@ static MyPlugin *_sharedInstance;
     pixelSpace /= [UIScreen mainScreen].scale;
     
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+
+    // Add script message handler
+    configuration.userContentController = [[WKUserContentController alloc] init];
+    [configuration.userContentController addScriptMessageHandler:self name:@"myMessageHandler"];
+
+
     CGRect frame = mainView.frame;
     frame.origin.y += pixelSpace;
     frame.size.height -= pixelSpace;
     webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
     webView.navigationDelegate = self;
-    
+
     NSURLRequest *nsrequest=[NSURLRequest requestWithURL:[NSURL URLWithString:URL]];
     [webView loadRequest:nsrequest];
     [mainView addSubview:webView];
@@ -68,6 +74,12 @@ static MyPlugin *_sharedInstance;
         [webView removeFromSuperview];
         webView = nil;
     }
+}
+
+// Handle messages from the web view
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    NSLog(@"Received message from web view: %@", message.body);
+    // Handle the message received from the web view
 }
 
 @end

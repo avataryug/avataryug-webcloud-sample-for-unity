@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed20b37376bd42e3af955934c77b7e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ProjectID: 
   webPanel: {fileID: 1644141456}
   topOffset: {fileID: 1102020553}
 --- !u!850595691 &182506332
@@ -474,8 +475,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 15046574}
+        m_TargetAssemblyTypeName: com.Avataryug.WebView.AvataryugWebView, Assembly-CSharp
         m_MethodName: CloseWebViewTapped
         m_Mode: 1
         m_Arguments:
